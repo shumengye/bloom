@@ -7,6 +7,15 @@ html, body {
   padding: 0;
 }
 
+#circle {
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+}
+
 /* common kaleidoscope styles */
 .caleido { 
   overflow: hidden;
