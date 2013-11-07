@@ -1,3 +1,38 @@
+function setCookie(c_name, value, exdays)
+{
+  console.log("Storing access token " + value);
+  var exdate=new Date();
+  exdate.setDate(exdate.getDate() + exdays);
+  var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+  document.cookie=c_name + "=" + c_value;
+}
+
+function getCookie(c_name)
+{
+  var c_value = document.cookie;
+  var c_start = c_value.indexOf(" " + c_name + "=");
+  if (c_start == -1)
+    {
+    c_start = c_value.indexOf(c_name + "=");
+    }
+  if (c_start == -1)
+    {
+    c_value = null;
+    }
+  else
+    {
+    c_start = c_value.indexOf("=", c_start) + 1;
+    var c_end = c_value.indexOf(";", c_start);
+    if (c_end == -1)
+    {
+  c_end = c_value.length;
+  }
+  c_value = unescape(c_value.substring(c_start,c_end));
+  }
+  return c_value;
+}
+
+
 function startCaleidoscope(f) {
 
     $(".caleido_cont").each(function(i){ 
@@ -17,7 +52,7 @@ function animateSegment(el, posX, posY) {
         function() {
           console.log("anim finished");
           $(el).css({backgroundPosition:'0px 0px'});
-          //animateSegment(el, posX, posY); 
+          animateSegment(el, posX, posY); 
         }
       );    
   return this;
@@ -59,12 +94,46 @@ function readFile( file ) {
 
   } 
 
+function showUserTracks() {
+  SC.get('/me/tracks', function(data) { 
+
+  for (var i=0; i<data.length; i++) {
+    //console.log(data[i].title);
+    var track = $( "<div class='track' id='" + data[i].id + "'>" + data[i].title + "</div>" );
+     $("#track-container").append(track);
+
+  }
+
+  $("#track-container").show();
+  }); 
+}
+
+function userLoggedIn() {
+  $("#disconnect-button").show();
+  $("#connect-container").hide();
+  showUserTracks();
+}
+
+function userLoggedOut() {
+  $("#disconnect-button").hide();
+  $("#connect-container").show();
+  $("#track-container").html("");
+  $("#track-container").hide();
+}
 
 
 (function($){
 
   // Parse setup
   Parse.initialize("fw2COe7Saq0JmTzWM6uargnLAotp1FnEiGb00xdX", "kraIdPRJY5EwCGRQBV3cDlHj1F4EMB9weRbkp2Kt");
+
+  // SoundCloud setup
+  SC.initialize({
+    client_id: "c35c98d3e6f2e8f3eb8662e8af9800fc",
+    redirect_uri: "https://dl.dropboxusercontent.com/u/986362/soundflower/callback.html",
+    access_token: getCookie("SC_SoundFlower"),
+    scope: 'non-expiring'
+  });
 
 
   //------------------------------
@@ -74,6 +143,44 @@ function readFile( file ) {
   //------------------------------
   startCaleidoscope();
 
+  //------------------------------
+  //
+  // Connect with SoundCloud
+  //
+  //------------------------------
+
+  //setCookie('SC_SoundFlower', "", 30); 
+
+  var act = getCookie("SC_SoundFlower");
+  if (act == null || act == "" || act==undefined) {
+    console.log("Not logged in " + act);
+    
+  }
+  else {
+    console.log("Logged in " + act);
+
+    userLoggedIn();
+  }
+
+  $("#connect-button").on('click', function (e) 
+  {
+     SC.connect(function(){
+
+        // Store access token
+        setCookie('SC_SoundFlower', SC.accessToken(), 30);
+
+        userLoggedIn();
+      
+      })
+  });
+
+  $("#disconnect-button").on('click', function (e) 
+  {
+    SC.accessToken(null); 
+    setCookie('SC_SoundFlower', "", 30);  
+
+    userLoggedOut();
+  });  
 
   //------------------------------
   //
