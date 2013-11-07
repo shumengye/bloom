@@ -30,6 +30,7 @@ h1 {
 }
 
 #connect-container {
+  display: none;
   width: 500px;
   height: 100px;
   position: absolute;
@@ -45,6 +46,7 @@ h1 {
   #connect-button {
     display: block;
     margin-top: 20px;
+    margin-left: 90px;
     cursor: pointer;
   }
 }
@@ -58,10 +60,10 @@ h1 {
   z-index: 20;
 }
 
-#track-container {
+#tracklist-container {
   display: none;
   width: 400px;
-  height: 450px;
+  height: 350px;
   position: absolute;
   margin: auto;
   top: 0;
@@ -69,7 +71,26 @@ h1 {
   left: 0;
   right: 0;
   z-index: 20;
-  background: white;
+  background: #474747;
+
+  .track {
+    cursor: pointer;
+
+  }
+}
+
+#track-container {
+  display: none;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #ff5c00;
 }
 
 #circle {

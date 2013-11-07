@@ -58,56 +58,6 @@ function animateSegment(el, posX, posY) {
   return this;
 }
 
-function readFile( file ) {
-    console.log(file);
-    var r = new FileReader();
-    if ( !file.type.match('image\/.*') ) {
-      return false;
-    }
-    
-    r.onload = function( e ) {
-      $(".ksc").css( 'background-image', [ 'url(', e.target.result, ')' ].join( '' ) );
-    };
-    
-    r.readAsDataURL( file );
-
-
-    var name = "photo.jpg";
-    var parseFile = new Parse.File(name, file);
-    parseFile.save().then(function() {
-      console.log("file saved to parse");
-      var newImage = new Parse.Object("Image");
-      newImage.set("imageFile", parseFile);
-      newImage.save(null, {
-
-        success: function(Image) {
-            console.log('New image object created');
-        },
-        error: function(Image, error) {  
-            console.log(error);
-          }
-      });
-
-    }, function(error) {
-      console.log(error);
-    });
-
-  } 
-
-function showUserTracks() {
-  SC.get('/me/tracks', function(data) { 
-
-  for (var i=0; i<data.length; i++) {
-    //console.log(data[i].title);
-    var track = $( "<div class='track' id='" + data[i].id + "'>" + data[i].title + "</div>" );
-     $("#track-container").append(track);
-
-  }
-
-  $("#track-container").show();
-  }); 
-}
-
 function userLoggedIn() {
   $("#disconnect-button").show();
   $("#connect-container").hide();
@@ -117,9 +67,122 @@ function userLoggedIn() {
 function userLoggedOut() {
   $("#disconnect-button").hide();
   $("#connect-container").show();
-  $("#track-container").html("");
-  $("#track-container").hide();
+  $("#tracklist-container").html("");
+  $("#tracklist-container").hide();
 }
+
+function showUserTracks() {
+  SC.get('/me/tracks', function(data) { 
+
+    for (var i=0; i<data.length; i++) {
+      console.log(data[i]);
+      var track = $( "<div  class='track' id='" + data[i].id + "'>" + data[i].user.username + ", "  + data[i].title + "</div>" );
+       $("#tracklist-container").append(track); 
+
+    }
+
+    // On select event for tracks
+    $(".track").on('click', function(e) {
+      trackSelected($(this).attr("id"));
+    }); 
+
+    $("#tracklist-container").show();
+  }); 
+}
+
+function trackSelected(trackId) {
+  console.log("Track selected " + trackId);
+
+  // Create new track on server
+  createNewTrack(trackId);
+
+  $("#tracklist-container").hide();
+
+  $("#track-container").html("" + trackId);
+  $("#track-container").show();
+
+  // Drag & drop file upload event listeners
+  var dragEl = $("#track-container");
+  dragEl.on('dragenter', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      $(this).css('border', '2px solid #0B85A1');
+  });
+  dragEl.on('dragover', function (e) {
+       e.stopPropagation();
+       e.preventDefault();
+  });
+  dragEl.on('drop', function (e) {  
+      $(this).css('border', '2px dotted #0B85A1');
+      e.preventDefault();
+      if (window.FileReader ) {
+        var file = e.originalEvent.dataTransfer.files[0];
+        attachImageToTrack( trackId, file);
+      }
+  });
+}
+
+function createNewTrack(trackId) {
+  // Check if Parse object already exists for this track, create one if needed
+  var ParseTrack = Parse.Object.extend("Track");
+  var query = new Parse.Query(ParseTrack);
+  query.equalTo("trackId", trackId);
+  
+  query.first().then(function(object) {
+    if (object == undefined) {
+        var newTrack = new Parse.Object("Track");
+        newTrack.set("trackId", trackId);
+        return newTrack.save();
+    }
+    return;
+  }).then(function(track) {
+    if (track != undefined)
+      console.log('New track object created');
+    else
+      console.log('Track already exists on Parse');
+    console.log(track);
+  }, function(error) {
+    console.log(error);
+  });
+
+}
+
+
+function attachImageToTrack(trackId, file) {
+    console.log(file);
+    var r = new FileReader();
+    if ( !file.type.match('image\/.*') )
+      return false;
+    
+    // Display image in kaleidoscope
+    r.onload = function( e ) {
+      $(".ksc").css( 'background-image', [ 'url(', e.target.result, ')' ].join( '' ) );
+    };
+    
+    r.readAsDataURL( file );
+
+    // Save image file to Parse
+    var name = "photo.jpg";
+    var parseFile = new Parse.File(name, file);
+
+    parseFile.save().then(function() {
+      var newImage = new Parse.Object("Image");
+      newImage.set("imageFile", parseFile);
+
+      // Link image object to track object
+      var track = new Parse.Object("Track");
+      track.id = trackId;
+      newImage.set("track", track);
+      
+      return newImage.save();
+    }, function(error) {
+      console.log("File could not be save to Parse");
+    }).then(function(image) {
+      console.log('New image object created');
+    }, function (error) {
+      console.log(error);
+    });
+} 
 
 
 (function($){
@@ -162,8 +225,7 @@ function userLoggedOut() {
     userLoggedIn();
   }
 
-  $("#connect-button").on('click', function (e) 
-  {
+  $("#connect-button").on('click', function (e)  {
      SC.connect(function(){
 
         // Store access token
@@ -174,8 +236,7 @@ function userLoggedOut() {
       })
   });
 
-  $("#disconnect-button").on('click', function (e) 
-  {
+  $("#disconnect-button").on('click', function (e)  {
     SC.accessToken(null); 
     setCookie('SC_SoundFlower', "", 30);  
 
