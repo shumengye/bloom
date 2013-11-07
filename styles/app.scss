@@ -8,7 +8,17 @@ html, body {
   font-family: “Lucida Grande”, “Lucida Sans Unicode”, “Lucida Sans”, “Garuda”, “Verdana”, “Tahoma”, sans-serif;
 }
 
-h1 {
+@mixin centered {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+.maintitle {
   display: inline-block;
   margin: 0 auto;
   font-size: 42px;
@@ -33,15 +43,9 @@ h1 {
   display: none;
   width: 500px;
   height: 100px;
-  position: absolute;
-  margin: auto;
+  @include centered;
   padding-left: 80px;
   padding-bottom: 80px;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
 
   #connect-button {
     display: block;
@@ -54,7 +58,7 @@ h1 {
 #disconnect-button {
   display: none;
   cursor: pointer;
-  position: fixed;
+  position: absolute;
   right: 20px;
   top: 20px;
   z-index: 20;
@@ -64,13 +68,7 @@ h1 {
   display: none;
   width: 400px;
   height: 350px;
-  position: absolute;
-  margin: auto;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
+  @include centered;
   background: #474747;
 
   .track {
@@ -83,14 +81,25 @@ h1 {
   display: none;
   width: 100px;
   height: 100px;
-  position: absolute;
-  margin: auto;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
+  @include centered;
   background: #ff5c00;
+}
+
+#track-player {
+  display: none;
+  width: 140px;
+  height: 140px;
+  @include centered;
+  cursor: pointer;
+  background: url('../assets/circle.svg');
+  background-size: cover;
+
+  .titles {
+    position: relative;
+    top: -100px;
+    left: 0;
+    right: 0;
+  }
 }
 
 #circle {

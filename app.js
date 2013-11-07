@@ -32,32 +32,6 @@ function getCookie(c_name)
   return c_value;
 }
 
-
-function startCaleidoscope(f) {
-
-    $(".caleido_cont").each(function(i){ 
-    $(this).find(".ksc").each(function(i){ 
-      $(this).css({ "background-position-x": 0, "background-position-y": 0  });
-      animateSegment(this, "100%", "80%");
-    });   
-  });
-}
-
-function animateSegment(el, posX, posY) {
-  var s = el;
-  $(el).animate(
-        { "background-position-x": posX, "background-position-y": posY },
-        10000,
-        'linear',
-        function() {
-          console.log("anim finished");
-          $(el).css({backgroundPosition:'0px 0px'});
-          animateSegment(el, posX, posY); 
-        }
-      );    
-  return this;
-}
-
 function userLoggedIn() {
   $("#disconnect-button").show();
   $("#connect-container").hide();
@@ -72,7 +46,7 @@ function userLoggedOut() {
 }
 
 function showUserTracks() {
-  SC.get('/me/tracks', function(data) { 
+  SC.get('/me/tracks', { filter: "public" }, function(data) { 
 
     for (var i=0; i<data.length; i++) {
       console.log(data[i]);
@@ -92,9 +66,6 @@ function showUserTracks() {
 
 function trackSelected(trackId) {
   console.log("Track selected " + trackId);
-
-  // Create new track on server
-  createNewTrack(trackId);
 
   $("#tracklist-container").hide();
 
@@ -122,32 +93,6 @@ function trackSelected(trackId) {
   });
 }
 
-function createNewTrack(trackId) {
-  // Check if Parse object already exists for this track, create one if needed
-  var ParseTrack = Parse.Object.extend("Track");
-  var query = new Parse.Query(ParseTrack);
-  query.equalTo("trackId", trackId);
-  
-  query.first().then(function(object) {
-    if (object == undefined) {
-        var newTrack = new Parse.Object("Track");
-        newTrack.set("trackId", trackId);
-        return newTrack.save();
-    }
-    return;
-  }).then(function(track) {
-    if (track != undefined)
-      console.log('New track object created');
-    else
-      console.log('Track already exists on Parse');
-    console.log(track);
-  }, function(error) {
-    console.log(error);
-  });
-
-}
-
-
 function attachImageToTrack(trackId, file) {
     console.log(file);
     var r = new FileReader();
@@ -168,12 +113,8 @@ function attachImageToTrack(trackId, file) {
     parseFile.save().then(function() {
       var newImage = new Parse.Object("Image");
       newImage.set("imageFile", parseFile);
+      newImage.set("trackId", trackId);
 
-      // Link image object to track object
-      var track = new Parse.Object("Track");
-      track.id = trackId;
-      newImage.set("track", track);
-      
       return newImage.save();
     }, function(error) {
       console.log("File could not be save to Parse");
@@ -184,8 +125,75 @@ function attachImageToTrack(trackId, file) {
     });
 } 
 
+function getUrlParameters(name) {
+    var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    return results != null ? results[1] : 0;
+}
+
+function bloom(trackId) {
+
+  SC.get('/tracks/'+trackId, { }, function(track) {
+    showTrackPlayer(track);
+
+    var Image = Parse.Object.extend("Image");
+    var query = new Parse.Query(Image);
+    query.equalTo("trackId", trackId);
+
+    query.find().then(function(results) {
+      var photo = results[0].get("imageFile");
+      setKaleidoImage(photo.url());
+      startKaleido();
+      
+    }, function(error) {
+      console.log(error);
+    });
+
+  });
+}
+
+function showTrackPlayer(trackObj) {
+  //alert("In setting player: " + trackObj.title);
+  $("#track-player").find(".tracktitle").html(trackObj.title + "");
+  $("#track-player").find(".username").html(trackObj.user.username);
+  $("#track-player").show();
+}
+
+function setKaleidoImage(url) {
+  $(".caleido .ksc").css("background-image", "url('" + url + "')");
+}
+
+function startKaleido() {
+    $(".caleido_cont").each(function(i){ 
+    $(this).find(".ksc").each(function(i){ 
+      $(this).css({ "background-position-x": 0, "background-position-y": 0  });
+      animateSegment(this, "100%", "80%");
+    });   
+  });
+}
+
+function animateSegment(el, posX, posY) {
+  var s = el;
+  $(el).animate(
+        { "background-position-x": posX, "background-position-y": posY },
+        10000,
+        'linear',
+        function() {
+          console.log("anim finished");
+          $(el).css({backgroundPosition:'0px 0px'});
+          animateSegment(el, posX, posY); 
+        }
+      );    
+  return this;
+}
+
 
 (function($){
+
+  //------------------------------
+  //
+  // Init
+  //
+  //------------------------------
 
   // Parse setup
   Parse.initialize("fw2COe7Saq0JmTzWM6uargnLAotp1FnEiGb00xdX", "kraIdPRJY5EwCGRQBV3cDlHj1F4EMB9weRbkp2Kt");
@@ -199,12 +207,28 @@ function attachImageToTrack(trackId, file) {
   });
 
 
-  //------------------------------
-  //
-  // Kaleidoscope animation
-  //
-  //------------------------------
-  startCaleidoscope();
+  var paramTrack = getUrlParameters("track");
+  if (paramTrack) {
+    // Playback mode
+    console.log(paramTrack);
+    bloom(paramTrack);
+  }
+  else {
+    startKaleido();
+
+    // Create mode, check if user is logged in
+    var act = getCookie("SC_SoundFlower");
+    if (act == null || act == "" || act==undefined) {
+      console.log("Not logged in " + act);
+      $("#connect-container").show();
+    }
+    else {
+      console.log("Logged in " + act);
+
+      userLoggedIn();
+    }
+  }
+
 
   //------------------------------
   //
@@ -214,23 +238,10 @@ function attachImageToTrack(trackId, file) {
 
   //setCookie('SC_SoundFlower', "", 30); 
 
-  var act = getCookie("SC_SoundFlower");
-  if (act == null || act == "" || act==undefined) {
-    console.log("Not logged in " + act);
-    
-  }
-  else {
-    console.log("Logged in " + act);
-
-    userLoggedIn();
-  }
-
   $("#connect-button").on('click', function (e)  {
      SC.connect(function(){
-
         // Store access token
         setCookie('SC_SoundFlower', SC.accessToken(), 30);
-
         userLoggedIn();
       
       })
@@ -239,7 +250,6 @@ function attachImageToTrack(trackId, file) {
   $("#disconnect-button").on('click', function (e)  {
     SC.accessToken(null); 
     setCookie('SC_SoundFlower', "", 30);  
-
     userLoggedOut();
   });  
 
@@ -248,30 +258,6 @@ function attachImageToTrack(trackId, file) {
   // File upload
   //
   //------------------------------
-  var dragEl = $("#circle");
-  dragEl.on('dragenter', function (e) 
-  {
-      e.stopPropagation();
-      e.preventDefault();
-      $(this).css('border', '2px solid #0B85A1');
-      console.log("file dragged");
-  });
-  dragEl.on('dragover', function (e) 
-  {
-       e.stopPropagation();
-       e.preventDefault();
-  });
-  dragEl.on('drop', function (e) 
-  {
-   
-      $(this).css('border', '2px dotted #0B85A1');
-      e.preventDefault();
-      if (window.FileReader ) {
-        var file = e.originalEvent.dataTransfer.files[0];
-        readFile( file );
-        console.log("file dropped " + file);
-      }
-  });
 
   $(document).on('dragenter', function (e) 
   {
