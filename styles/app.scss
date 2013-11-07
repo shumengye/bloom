@@ -8,11 +8,14 @@ html, body {
 }
 
 #circle {
-  width: 400px;
-  height: 400px;
+  width: 100px;
+  height: 100px;
   position: absolute;
+  margin: auto;
   top: 0;
+  bottom: 0;
   left: 0;
+  right: 0;
   z-index: 20;
 }
 

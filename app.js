@@ -3,23 +3,27 @@ function startCaleidoscope(f) {
     $(".caleido_cont").each(function(i){ 
     $(this).find(".ksc").each(function(i){ 
       $(this).css({ "background-position-x": 0, "background-position-y": 0  });
-      $(this).animate({ "background-position-x": "100%", "background-position-y": "80%" }, 15000);
+      animateSegment(this, "100%", "80%");
     });   
   });
 }
 
+function animateSegment(el, posX, posY) {
+  var s = el;
+  $(el).animate(
+        { "background-position-x": posX, "background-position-y": posY },
+        10000,
+        'linear',
+        function() {
+          console.log("anim finished");
+          $(el).css({backgroundPosition:'0px 0px'});
+          //animateSegment(el, posX, posY); 
+        }
+      );    
+  return this;
+}
 
-
-(function($){
-
-  // Parse setup
-  Parse.initialize("fw2COe7Saq0JmTzWM6uargnLAotp1FnEiGb00xdX", "kraIdPRJY5EwCGRQBV3cDlHj1F4EMB9weRbkp2Kt");
-
-
-  startCaleidoscope();
-
-
-  function readFile( file ) {
+function readFile( file ) {
     console.log(file);
     var r = new FileReader();
     if ( !file.type.match('image\/.*') ) {
@@ -55,19 +59,41 @@ function startCaleidoscope(f) {
 
   } 
 
-  $("#circle").on('dragenter', function (e) 
+
+
+(function($){
+
+  // Parse setup
+  Parse.initialize("fw2COe7Saq0JmTzWM6uargnLAotp1FnEiGb00xdX", "kraIdPRJY5EwCGRQBV3cDlHj1F4EMB9weRbkp2Kt");
+
+
+  //------------------------------
+  //
+  // Kaleidoscope animation
+  //
+  //------------------------------
+  startCaleidoscope();
+
+
+  //------------------------------
+  //
+  // File upload
+  //
+  //------------------------------
+  var dragEl = $("#circle");
+  dragEl.on('dragenter', function (e) 
   {
       e.stopPropagation();
       e.preventDefault();
       $(this).css('border', '2px solid #0B85A1');
       console.log("file dragged");
   });
-  $("#circle").on('dragover', function (e) 
+  dragEl.on('dragover', function (e) 
   {
        e.stopPropagation();
        e.preventDefault();
   });
-  $("#circle").on('drop', function (e) 
+  dragEl.on('drop', function (e) 
   {
    
       $(this).css('border', '2px dotted #0B85A1');
@@ -80,21 +106,20 @@ function startCaleidoscope(f) {
   });
 
   $(document).on('dragenter', function (e) 
-{
+  {
+      e.stopPropagation();
+      e.preventDefault();
+  });
+  $(document).on('dragover', function (e) 
+  {
     e.stopPropagation();
     e.preventDefault();
-});
-$(document).on('dragover', function (e) 
-{
-  e.stopPropagation();
-  e.preventDefault();
-  obj.css('border', '2px dotted #0B85A1');
-});
-$(document).on('drop', function (e) 
-{
-    e.stopPropagation();
-    e.preventDefault();
-});
+  });
+  $(document).on('drop', function (e) 
+  {
+      e.stopPropagation();
+      e.preventDefault();
+  });
 
 })(jQuery);
 
