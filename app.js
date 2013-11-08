@@ -158,11 +158,10 @@ function trackSelected(trackId, username, title, duration, permalinkUrl) {
   $('#fileElem').on("change", function(event) {
     var FileList = event.target.files;
     var File = FileList[0];
-    //alert(File.type);
     attachImageToTrack(trackId, File);
   });
 
-  // Drag & drop file upload event listeners
+  // Drag & drop file upload eventlisteners
   var dragEl = $("#uploadcircle");
   dragEl.on('dragenter', function (e) {
       e.stopPropagation();
@@ -185,6 +184,22 @@ function trackSelected(trackId, username, title, duration, permalinkUrl) {
         attachImageToTrack(trackId, file);
       }
   });
+
+  $(document).on('dragenter', function (e) 
+  {
+      e.stopPropagation();
+      e.preventDefault();
+  });
+  $(document).on('dragover', function (e) 
+  {
+    e.stopPropagation();
+    e.preventDefault();
+  });
+  $(document).on('drop', function (e) 
+  {
+      e.stopPropagation();
+      e.preventDefault();
+  });
 }
 
 //------------------------------
@@ -194,6 +209,10 @@ function trackSelected(trackId, username, title, duration, permalinkUrl) {
 //------------------------------
 
 function attachImageToTrack(trackId, file) {
+    $("#uploadstatus").hide();
+    $("#uploadstatus").fadeIn(2000);
+    $("#uploadstatus").html("Uploading...");
+
     var r = new FileReader();
     if ( !file.type.match('image\/.*') )
       return false;
@@ -204,6 +223,7 @@ function attachImageToTrack(trackId, file) {
     };
     
     r.readAsDataURL( file );
+    startKaleido();
 
     // Save image file to Parse
     if (file.type == "image/png")
@@ -224,7 +244,10 @@ function attachImageToTrack(trackId, file) {
     }, function(error) {
       console.log("File could not be save to Parse");
     }).then(function(image) {
-      console.log('New image object created');
+      
+      $("#uploadstatus").html("Image added");
+      $("#uploadstatus" ).fadeOut(2000);
+
     }, function (error) {
       console.log(error);
     });
@@ -461,16 +484,11 @@ function animateSegment(el, posX, posY) {
     }
   }
 
-
-
   //------------------------------
   //
   // Connect with SoundCloud
   //
   //------------------------------
-
-  //setCookie('SC_SoundFlower', "", 30); 
-
   $("#connect-button").on('click', function (e)  {
      SC.connect(function(){
         // Store access token
@@ -486,27 +504,11 @@ function animateSegment(el, posX, posY) {
     userLoggedOut();
   });  
 
-  //------------------------------
-  //
-  // File upload
-  //
-  //------------------------------
-
-  $(document).on('dragenter', function (e) 
-  {
-      e.stopPropagation();
-      e.preventDefault();
-  });
-  $(document).on('dragover', function (e) 
-  {
-    e.stopPropagation();
-    e.preventDefault();
-  });
-  $(document).on('drop', function (e) 
-  {
-      e.stopPropagation();
-      e.preventDefault();
-  });
+  // Preload some images
+  var img1 = new Image;
+  img1.src = "assets/circle_hover.svg"
+  var img2 = new Image;
+  img2.src = "assets/header-bg.png"
 
 })(jQuery);
 

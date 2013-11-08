@@ -262,6 +262,18 @@ $inner_item_width_iphone_portrait: 370px;
 #upload-container {
   display: none;
 
+    #uploadstatus {
+      display: inline-block;
+      width: 400px;
+      height: 20px;
+      text-align: center;
+      @include centered; 
+      bottom: -200px;
+      color: #ff3400;
+      ffont-size: 24px;
+      line-height: 26px;
+    }
+
    .titles {
       width: 600px;
       height: 80px;
@@ -299,6 +311,7 @@ $inner_item_width_iphone_portrait: 370px;
       cursor: pointer;
       background: url('../assets/circle.svg');
       background-size: cover;
+
 
       @include iphone {
         display: none;
@@ -350,6 +363,8 @@ $inner_item_width_iphone_portrait: 370px;
       }
     }
 }
+
+
 
 #track-player {
   display: none; 
