@@ -1,3 +1,9 @@
+//------------------------------
+//
+// User login
+//
+//------------------------------
+
 function setCookie(c_name, value, exdays)
 {
   console.log("Storing access token " + value);
@@ -45,6 +51,12 @@ function userLoggedOut() {
   $("#tracklist-container").hide();
 }
 
+//------------------------------
+//
+// Track selection
+//
+//------------------------------
+
 function showUserTracks() {
   SC.get('/me/tracks', { filter: "public" }, function(data) { 
 
@@ -76,31 +88,31 @@ function showUserTracks() {
 
       track.append(right);
       $("#tracklist-container .list").append(track);   
-    }
 
-    // On select event for tracks
-    $(".track").on('click', function(e) {
-      trackSelected($(this).attr("id"), 
-        $(this).find(".username").html(),
-        $(this).find(".title").html(),
-        $(this).find(".duration").html()
-      );
-    }); 
+      // On select event for tracks
+      var tmp = data[i];
+      track.on('click', function(e) {
+        trackSelected($(this).attr("id"), 
+          $(this).find(".username").html(),
+          $(this).find(".title").html(),
+          $(this).find(".duration").html(),
+          tmp.permalink_url
+        );
+      }); 
+    }
 
     $("#tracklist-container").show();
   }); 
 }
 
-function trackSelected(trackId, username, title, duration) {
-  console.log("Track selected " + trackId);
+function trackSelected(trackId, username, title, duration, permalinkUrl) {
 
   $("#tracklist-container").hide();
 
-  //$("#upload-container").html();
   $("#upload-container").find(".tracktitle").html(title);
   $("#upload-container").find(".username").html(username);
   $("#upload-container").find(".time").html(duration);
-  //$("#upload-container").find(".titles").attr("href", trackObj.permalink_url);
+  $("#upload-container").find(".titles").attr("href", permalinkUrl);
   $("#upload-container").show();
 
 
@@ -143,8 +155,13 @@ function trackSelected(trackId, username, title, duration) {
   });
 }
 
+//------------------------------
+//
+// Image upload
+//
+//------------------------------
+
 function attachImageToTrack(trackId, file) {
-    console.log(file);
     var r = new FileReader();
     if ( !file.type.match('image\/.*') )
       return false;
@@ -157,7 +174,13 @@ function attachImageToTrack(trackId, file) {
     r.readAsDataURL( file );
 
     // Save image file to Parse
-    var name = "photo.jpg";
+    if (file.type == "image/png")
+      var name = "photo.png";
+    else if (file.type == "image/gif")
+      var name = "photo.gif";
+    else
+      var name = "photo.jpg";
+
     var parseFile = new Parse.File(name, file);
 
     parseFile.save().then(function() {
@@ -180,6 +203,11 @@ function getUrlParameters(name) {
     return results != null ? results[1] : 0;
 }
 
+//------------------------------
+//
+// Playback
+//
+//------------------------------
 
 function bloom(trackId) {
   SC.get('/tracks/'+trackId, { }, function(track) {
@@ -187,7 +215,7 @@ function bloom(trackId) {
     var Image = Parse.Object.extend("Image");
     var query = new Parse.Query(Image);
     query.equalTo("trackId", trackId);
-
+    query.ascending("createdAt");
     query.find().then(function(results) {
   
       // Store all image urls
@@ -211,6 +239,7 @@ function bloom(trackId) {
   });
 }
 
+// Converts second to position string format 0:00
 function positionString(sec) {
   var sec1 = 0;  // single seconds
   var sec2 = 0;  // tens of seconds
@@ -244,8 +273,8 @@ function setTrackPlayer(trackObj, kaleidoImages) {
 
   var playing = false; 
   var sound;
-  //trackObj.id
-  SC.stream("/tracks/74916325" , function(streamed){
+  // Stream track
+  SC.stream("/tracks/" + trackObj.id, function(streamed){
     sound = streamed;
   });
 
@@ -319,6 +348,12 @@ function trackFinished(imageUrl) {
   $("#playbutton").show();
   $("#pausebutton").hide();
 }
+
+//------------------------------
+//
+// Kaleidoscope
+//
+//------------------------------
 
 function setKaleidoImage(url) {
   $(".caleido .ksc").css("background-image", "url('" + url + "')");
