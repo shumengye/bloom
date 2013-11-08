@@ -112,10 +112,14 @@ html, body {
     .item {
       float: left;
       margin: 0;
-      padding: 14px 20px 11px 20px;
+      padding: 14px 20px 13px 20px;
       color: #fff;
-      
       border-right: 1px solid rgba(255,255,255,.05);
+
+      @include iphone {
+        padding: 14px 20px 11px 20px;
+      }
+
 
       &.selected {
         @include text-shadow(0 1px 0 #000);
@@ -163,7 +167,7 @@ html, body {
         float: right;
         display: inline-block;
         padding: 4px 6px;
-        margin: 2px 8px 0 0;
+        margin: 2px 0 0 0;
         @include border-radius(4px);
         @include linear-gradient("top, #ff6400 0%, #ff3600 100%");
         color: white;
@@ -179,20 +183,34 @@ html, body {
         color: #333;
       }
 
+      $item_width: 310px;
+
       .wave {
-        width: 270px;
+        position: relative;
+        width: $item_width;
         @include linear-gradient("top, #878686 0%, #404040 60%, #f2f2f2 100%");
 
         .wave-mask {
            -webkit-mask-box-image: url(https://w1.sndcdn.com/cWHNerOLlkUq_m.png);
           background: white;
           height: 40px;
-          width: 270px;
+          width: $item_width;
         }
       }
 
+      .duration {
+        display: inline-block;
+        background: #000;
+        padding: 1px 0 1px 1px;
+        color: #8e8e8e;
+        position: absolute;
+        bottom: 15px;
+        right: 0;
+        font-size: .6em;
+      }
+
       .border {
-        width: 270px;
+        width: $item_width;
         height: 1px;
         margin-top: 6px;
         border-bottom: 1px solid #e5e5e5;
@@ -201,12 +219,96 @@ html, body {
   }
 }
 
-#track-container {
+#upload-container {
   display: none;
-  width: 100px;
-  height: 100px;
-  @include centered;
-  background: #ff5c00;
+
+   .titles {
+      width: 600px;
+      height: 80px;
+      text-align: center;
+      @include centered; 
+      top: -280px;
+      @include iphone-portrait {
+          top: -400px;
+      }
+    }
+    
+    .subtitle {
+      font-size: 24px;
+      line-height: 26px;
+
+      @include iphone-portrait {
+        font-size: 36px;
+        line-height: 38px;
+      }
+    }
+
+    .time {
+      font-size: 18px;
+      line-height: 20px;  
+      @include iphone-portrait {
+        font-size: 26px;
+        line-height: 28px;
+      }
+    }
+
+    .uploadcircle {
+      width: 120px;
+      height: 120px;
+      @include centered;  
+      cursor: pointer;
+      background: url('../assets/circle.svg');
+      background-size: cover;
+
+      @include iphone {
+        display: none;
+      }
+
+      @include ipad {
+        display: none;
+      }
+
+      &:hover {
+        background-image: url('../assets/circle_hover.svg');
+      }
+
+      &.dragged {
+        background-image: url('../assets/circle_hover.svg');
+      }
+
+      .icon {
+        width: 30px;
+        display: block;
+        margin: 20px auto 0 auto;
+      }
+
+      .label {
+        margin: 8px auto 0 auto;
+        color: white;
+        text-align: center;
+        line-height: 1.1em;
+      }
+    }
+
+    #uploadcircle-mobile {
+      display: none;
+      width: 120px;
+      height: 120px;
+
+      @include iphone {
+        display: block;
+      }
+
+      @include ipad {
+        display: block;
+      }
+
+      input[type="file"]#fileElem {
+        visibility: hidden;
+        width: 0;
+        height: 0;
+      }
+    }
 }
 
 #track-player {

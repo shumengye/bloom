@@ -50,7 +50,6 @@ function showUserTracks() {
 
     // Display user tracks
     for (var i=0; i<data.length; i++) {
-      console.log(data[i]);
        // Track info 
       var track = $("<div  class='track' id='" + data[i].id + "'></div>" );
       if (data[i].artwork_url == null || data[i].artwork_url == "null")
@@ -68,49 +67,78 @@ function showUserTracks() {
       var wavemask = $("<div class='wave-mask'></div>");
       wavemask.css("-webkit-mask-box-image", "url(" +  data[i].waveform_url + ")");
       wave.append(wavemask);
+      var duration = $("<div class='duration'>" + positionString(Math.floor(data[i].duration/1000)) + "</div>");
+      wave.append(duration);
       right.append(wave);
 
       var border = $("<div class='border'></div>");
       right.append(border);
 
       track.append(right);
-      $("#tracklist-container .list").append(track);      
+      $("#tracklist-container .list").append(track);   
     }
 
     // On select event for tracks
     $(".track").on('click', function(e) {
-      trackSelected($(this).attr("id"));
+      trackSelected($(this).attr("id"), 
+        $(this).find(".username").html(),
+        $(this).find(".title").html(),
+        $(this).find(".duration").html()
+      );
     }); 
 
     $("#tracklist-container").show();
   }); 
 }
 
-function trackSelected(trackId) {
+function trackSelected(trackId, username, title, duration) {
   console.log("Track selected " + trackId);
 
   $("#tracklist-container").hide();
 
-  $("#track-container").html("" + trackId);
-  $("#track-container").show();
+  //$("#upload-container").html();
+  $("#upload-container").find(".tracktitle").html(title);
+  $("#upload-container").find(".username").html(username);
+  $("#upload-container").find(".time").html(duration);
+  //$("#upload-container").find(".titles").attr("href", trackObj.permalink_url);
+  $("#upload-container").show();
+
+
+  // Mobile file upload
+  // Simulate click on hidden file input
+  document.querySelector('#uploadcircle-mobile').addEventListener('click', function(e) {
+    var fileInput = document.querySelector('#fileElem');
+    fileInput.click(); 
+  }, false);
+
+  $('#fileElem').on("change", function(event) {
+    var FileList = event.target.files;
+    var File = FileList[0];
+    //alert(File.type);
+    attachImageToTrack(trackId, File);
+  });
 
   // Drag & drop file upload event listeners
-  var dragEl = $("#track-container");
+  var dragEl = $("#uploadcircle");
   dragEl.on('dragenter', function (e) {
       e.stopPropagation();
       e.preventDefault();
-      $(this).css('border', '2px solid #0B85A1');
+      $(this).toggleClass("dragged");
+  });
+  dragEl.on('dragleave', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      $(this).toggleClass("dragged");
   });
   dragEl.on('dragover', function (e) {
        e.stopPropagation();
        e.preventDefault();
   });
   dragEl.on('drop', function (e) {  
-      $(this).css('border', '2px dotted #0B85A1');
       e.preventDefault();
       if (window.FileReader ) {
         var file = e.originalEvent.dataTransfer.files[0];
-        attachImageToTrack( trackId, file);
+        attachImageToTrack(trackId, file);
       }
   });
 }
@@ -360,6 +388,7 @@ function animateSegment(el, posX, posY) {
       userLoggedIn();
     }
   }
+
 
 
   //------------------------------
