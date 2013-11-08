@@ -95,6 +95,9 @@ html, body {
     text-align: center; }
     #track-player .titles .subtitle {
       font-size: 24px; }
+    #track-player .titles .time {
+      font-size: 18px;
+      line-height: 20px; }
   #track-player #playcircle {
     width: 100px;
     height: 100px;

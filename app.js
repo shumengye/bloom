@@ -48,11 +48,10 @@ function userLoggedOut() {
 function showUserTracks() {
   SC.get('/me/tracks', { filter: "public" }, function(data) { 
 
+    // Display user tracks
     for (var i=0; i<data.length; i++) {
-      console.log(data[i]);
       var track = $( "<div  class='track' id='" + data[i].id + "'>" + data[i].user.username + ", "  + data[i].title + "</div>" );
-       $("#tracklist-container").append(track); 
-
+      $("#tracklist-container").append(track); 
     }
 
     // On select event for tracks
@@ -130,18 +129,29 @@ function getUrlParameters(name) {
     return results != null ? results[1] : 0;
 }
 
-function bloom(trackId) {
 
+function bloom(trackId) {
   SC.get('/tracks/'+trackId, { }, function(track) {
-    showTrackPlayer(track);
 
     var Image = Parse.Object.extend("Image");
     var query = new Parse.Query(Image);
     query.equalTo("trackId", trackId);
 
     query.find().then(function(results) {
-      var photo = results[0].get("imageFile");
-      setKaleidoImage(photo.url());
+  
+      // Store all image urls
+      var kaleidoImages = new Array();
+      if (results.length > 0) {
+        for (var i = 0; i < results.length; i++) {
+          var photo = results[i].get("imageFile");
+          kaleidoImages.push(photo.url());
+        }
+      }
+      else
+        kaleidoImages.push("assets/photo.jpg");
+
+      // Set up player
+      setTrackPlayer(track, kaleidoImages);
       
     }, function(error) {
       console.log(error);
@@ -150,30 +160,93 @@ function bloom(trackId) {
   });
 }
 
-function showTrackPlayer(trackObj) {
-  //$("#track-player").find(".tracktitle").html(trackObj.title);
-  //$("#track-player").find(".username").html(trackObj.user.username);
+function positionString(sec) {
+  var sec1 = 0;  // single seconds
+  var sec2 = 0;  // tens of seconds
+  var min = 0;  // minutes
+
+  var sec2_tmp = sec; // stores seconds left after removing minutes
+  var sec1_tmp = sec; // stores seconds left after tens of seconds
+
+  // Minutes
+  if (sec >= 60) {
+    sec2_tmp = sec % 60; 
+    min = (sec - sec2_tmp) / 60;
+  }
+  // Tens of seconds
+  if (sec >= 10) {
+    sec1_tmp = sec2_tmp % 10;
+    sec2 = (sec2_tmp - sec1_tmp) / 10;
+  }
+  // Remaining seconds
+  sec1 = sec1_tmp;
+
+  return min + ":" + sec2 + sec1;
+}
+
+function setTrackPlayer(trackObj, kaleidoImages) {
+  // Title and username
+  $("#track-player").find(".tracktitle").html(trackObj.title);
+  $("#track-player").find(".username").html(trackObj.user.username);
   $("#track-player").find(".titles").attr("href", trackObj.permalink_url);
-  $("#track-player").find(".tracktitle").html("Mixmag premiere: Sound Pellegrino presents 'SND.PE VOL 1'");
-  $("#track-player").find(".username").html("Shumeng Ye");
   $("#track-player").show();
 
   var playing = false; 
   var sound;
+
   SC.stream("/tracks/" + trackObj.id, function(streamed){
     sound = streamed;
   });
 
+  // Set first image for kaleidoscope
+  setKaleidoImage(kaleidoImages[0]);
+  // Preload remaining images
+  for (var i = 1; i < kaleidoImages.length; i++) {
+    var img = new Image();
+    img.src = kaleidoImages[i];
+  }
+  var currentImage = 0;
+  // Check if there are more than one image, imagePivot is interval to next image in seconds
+  if (kaleidoImages.length > 1)
+    var imagePivot = Math.floor( Math.floor(trackObj.duration / 1000) / kaleidoImages.length );
+  else
+    var imagePivot = 0;
+
   $("#playcircle").on('click', function (e) {  
+    // Play button was clicked
     if (!playing) {
       playing = true;
-      sound.play();
       $("#playbutton").hide();
       $("#pausebutton").show();
+
+      sound.play({ 
+
+        // Position related updates
+        whileplaying: function() { 
+          // Update position
+          var sec = Math.floor(sound.position/1000);
+          $("#track-player").find(".time").html(positionString(sec));
+
+          // Check if the next image should be displayed 
+          if (imagePivot > 0 && sec > imagePivot && currentImage < (kaleidoImages.length-1)) {
+            currentImage++;
+            setKaleidoImage(kaleidoImages[currentImage]);
+            imagePivot += imagePivot;
+          }
+        },
+
+        // Track has ended
+        onfinish: function() {
+          playing = false;
+          trackFinished(kaleidoImages[0]);
+        }
+
+      });
 
       // Animate Kaleidoscope
       startKaleido();
     }
+    // Pause button was clicked
     else {
       playing = false;
       sound.pause();
@@ -184,7 +257,14 @@ function showTrackPlayer(trackObj) {
       $(".caleido_cont").find(".ksc" ).stop();
     }
   });
+}
 
+function trackFinished(imageUrl) {
+  $(".caleido_cont").find(".ksc" ).stop();
+  setKaleidoImage(imageUrl);
+  $("#track-player").find(".time").html("0:00");
+  $("#playbutton").show();
+  $("#pausebutton").hide();
 }
 
 function setKaleidoImage(url) {
@@ -207,7 +287,6 @@ function animateSegment(el, posX, posY) {
         10000,
         'linear',
         function() {
-          console.log("anim finished");
           $(el).css({backgroundPosition:'0px 0px'});
           animateSegment(el, posX, posY); 
         }
