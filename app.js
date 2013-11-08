@@ -50,8 +50,31 @@ function showUserTracks() {
 
     // Display user tracks
     for (var i=0; i<data.length; i++) {
-      var track = $( "<div  class='track' id='" + data[i].id + "'>" + data[i].user.username + ", "  + data[i].title + "</div>" );
-      $("#tracklist-container").append(track); 
+      console.log(data[i]);
+       // Track info 
+      var track = $("<div  class='track' id='" + data[i].id + "'></div>" );
+      if (data[i].artwork_url == null || data[i].artwork_url == "null")
+        var artwork = data[i].user.avatar_url ;
+      else
+        var artwork = data[i].artwork_url;
+      track.append("<img class='artwork' src='" + artwork  + "'>");
+      var right = $("<div class='right'></div>");
+      right.append("<div class='bloombutton'>Select</div>");
+      right.append("<div class='username'>" + data[i].user.username  + "</div>");
+      right.append("<div class='title'>" + data[i].title  + "</div>");
+
+      // Waveform
+      var wave = $("<div class='wave'></div>");
+      var wavemask = $("<div class='wave-mask'></div>");
+      wavemask.css("-webkit-mask-box-image", "url(" +  data[i].waveform_url + ")");
+      wave.append(wavemask);
+      right.append(wave);
+
+      var border = $("<div class='border'></div>");
+      right.append(border);
+
+      track.append(right);
+      $("#tracklist-container .list").append(track);      
     }
 
     // On select event for tracks
