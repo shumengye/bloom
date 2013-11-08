@@ -142,7 +142,6 @@ function bloom(trackId) {
     query.find().then(function(results) {
       var photo = results[0].get("imageFile");
       setKaleidoImage(photo.url());
-      startKaleido();
       
     }, function(error) {
       console.log(error);
@@ -152,10 +151,40 @@ function bloom(trackId) {
 }
 
 function showTrackPlayer(trackObj) {
-  //alert("In setting player: " + trackObj.title);
-  $("#track-player").find(".tracktitle").html(trackObj.title + "");
-  $("#track-player").find(".username").html(trackObj.user.username);
+  //$("#track-player").find(".tracktitle").html(trackObj.title);
+  //$("#track-player").find(".username").html(trackObj.user.username);
+  $("#track-player").find(".titles").attr("href", trackObj.permalink_url);
+  $("#track-player").find(".tracktitle").html("Mixmag premiere: Sound Pellegrino presents 'SND.PE VOL 1'");
+  $("#track-player").find(".username").html("Shumeng Ye");
   $("#track-player").show();
+
+  var playing = false; 
+  var sound;
+  SC.stream("/tracks/" + trackObj.id, function(streamed){
+    sound = streamed;
+  });
+
+  $("#playcircle").on('click', function (e) {  
+    if (!playing) {
+      playing = true;
+      sound.play();
+      $("#playbutton").hide();
+      $("#pausebutton").show();
+
+      // Animate Kaleidoscope
+      startKaleido();
+    }
+    else {
+      playing = false;
+      sound.pause();
+      $("#playbutton").show();
+      $("#pausebutton").hide();
+
+      // Pause Kaleidoscope animation
+      $(".caleido_cont").find(".ksc" ).stop();
+    }
+  });
+
 }
 
 function setKaleidoImage(url) {

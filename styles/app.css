@@ -80,35 +80,61 @@ html, body {
   background: #ff5c00; }
 
 #track-player {
-  display: none;
-  width: 140px;
-  height: 140px;
-  position: absolute;
-  margin: auto;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  cursor: pointer;
-  background: url("../assets/circle.svg");
-  background-size: cover; }
+  display: none; }
   #track-player .titles {
-    position: relative;
-    top: -100px;
+    width: 700px;
+    height: 80px;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
     left: 0;
-    right: 0; }
+    right: 0;
+    z-index: 20;
+    top: -280px;
+    text-align: center; }
+    #track-player .titles .subtitle {
+      font-size: 24px; }
+  #track-player #playcircle {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    cursor: pointer;
+    background: url("../assets/circle.svg");
+    background-size: cover; }
+    #track-player #playcircle #playbutton {
+      height: 40px;
+      position: absolute;
+      margin: auto;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding-left: 10px; }
+    #track-player #playcircle #pausebutton {
+      display: none;
+      height: 35px;
+      position: absolute;
+      margin: auto;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20; }
 
-#circle {
-  display: none;
-  width: 100px;
-  height: 100px;
+#poweredlogo {
   position: absolute;
-  margin: auto;
-  top: 0;
-  bottom: 0;
+  bottom: 20px;
   left: 0;
   right: 0;
+  margin: auto;
   z-index: 20; }
 
 /* common kaleidoscope styles */

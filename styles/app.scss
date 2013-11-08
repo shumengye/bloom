@@ -86,33 +86,50 @@ html, body {
 }
 
 #track-player {
-  display: none;
-  width: 140px;
-  height: 140px;
-  @include centered;
-  cursor: pointer;
-  background: url('../assets/circle.svg');
-  background-size: cover;
+  display: none; 
 
   .titles {
-    position: relative;
-    top: -100px;
-    left: 0;
-    right: 0;
+    width: 700px;
+    height: 80px;
+    @include centered; 
+    top: -280px;
+
+    text-align: center;
+
+    .subtitle {
+      font-size: 24px;
+    }
+  }
+
+  #playcircle {
+    width: 100px;
+    height: 100px;
+    @include centered;  
+    cursor: pointer;
+    background: url('../assets/circle.svg');
+    background-size: cover;
+
+    #playbutton {
+      height: 40px;
+      @include centered; 
+      padding-left: 10px; 
+    }
+
+    #pausebutton {
+      display: none;
+      height: 35px;
+      @include centered; 
+    }
   }
 }
 
-#circle {
-  display: none;
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  margin: auto;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
+#poweredlogo {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      margin: auto;
+      z-index: 20;
 }
 
 /* common kaleidoscope styles */
