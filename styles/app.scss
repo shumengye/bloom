@@ -88,15 +88,30 @@ html, body {
   z-index: 20;
 }
 
+$item_width: 440px;
+$item_width_iphone_portrait: 500px;
+
+$inner_item_width: 310px;
+$inner_item_width_iphone_portrait: 370px;
+
 #tracklist-container {
   display: none;
-  width: 440px;
-  max-height: 414px;
+  width: $item_width;
+  max-height: 464px;
   @include centered;
 
+  @include iphone-portrait {
+    width: $item_width_iphone_portrait;
+    max-height: 714px;
+  }
+
   .list {
-    max-height: 350px;
+    max-height: 400px;
     overflow: scroll;
+
+    @include iphone-portrait {
+      max-height: 654px;
+    }
   }
   
   .buffer {
@@ -120,7 +135,6 @@ html, body {
         padding: 14px 20px 11px 20px;
       }
 
-
       &.selected {
         @include text-shadow(0 1px 0 #000);
         @include box-shadow(inset 0 0 15px rgba(0,0,0,.6));
@@ -129,7 +143,23 @@ html, body {
       &.title-item {
         @include linear-gradient("top, #ff6400 0%, #ff3600 100%");
       }
+    }
 
+    #usertracks {
+      cursor: pointer;
+    }
+
+    #searchInput {
+      width: 210px;
+      margin: 8px 0 8px 15px;
+      padding:  4px 5px;
+      @include border-radius(5px);
+      box-shadow: none;
+      border: 0;
+      outline: none;
+      color: #333;
+      font-size: 14px;
+      background: rgba(255,255,255,.9);
     }
 
   }
@@ -183,18 +213,24 @@ html, body {
         color: #333;
       }
 
-      $item_width: 310px;
-
       .wave {
         position: relative;
-        width: $item_width;
+        width: $inner_item_width;
         @include linear-gradient("top, #878686 0%, #404040 60%, #f2f2f2 100%");
+
+        @include iphone_portrait {
+          width: $inner_item_width_iphone_portrait;
+        }
 
         .wave-mask {
            -webkit-mask-box-image: url(https://w1.sndcdn.com/cWHNerOLlkUq_m.png);
           background: white;
           height: 40px;
-          width: $item_width;
+          width: $inner_item_width;
+
+          @include iphone_portrait {
+            width: $inner_item_width_iphone_portrait;
+          }
         }
       }
 
@@ -210,10 +246,14 @@ html, body {
       }
 
       .border {
-        width: $item_width;
+        width: $inner_item_width;
         height: 1px;
         margin-top: 6px;
         border-bottom: 1px solid #e5e5e5;
+
+        @include iphone_portrait {
+          width: $inner_item_width_iphone_portrait;
+        }
       }
     }    
   }

@@ -71,7 +71,7 @@ html, body {
 #tracklist-container {
   display: none;
   width: 440px;
-  max-height: 414px;
+  max-height: 464px;
   position: absolute;
   margin: auto;
   top: 0;
@@ -79,9 +79,16 @@ html, body {
   left: 0;
   right: 0;
   z-index: 20; }
+  @media screen and (max-device-width: 320px) and (orientation: portrait) {
+    #tracklist-container {
+      width: 500px;
+      max-height: 714px; } }
   #tracklist-container .list {
-    max-height: 350px;
+    max-height: 400px;
     overflow: scroll; }
+    @media screen and (max-device-width: 320px) and (orientation: portrait) {
+      #tracklist-container .list {
+        max-height: 654px; } }
   #tracklist-container .buffer {
     height: 20px;
     background: #fff; }
@@ -116,6 +123,26 @@ html, body {
         background-image: -ms-linear-gradient(top, #ff6400 0%, #ff3600 100%);
         background-image: -o-linear-gradient(top, #ff6400 0%, #ff3600 100%);
         background-image: linear-gradient(top, #ff6400 0%, #ff3600 100%); }
+    #tracklist-container .menu #usertracks {
+      cursor: pointer; }
+    #tracklist-container .menu #searchInput {
+      width: 210px;
+      margin: 8px 0 8px 15px;
+      padding: 4px 5px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      -ms-border-radius: 5px;
+      -o-border-radius: 5px;
+      border-radius: 5px;
+      -webkit-background-clip: padding-box;
+      -moz-background-clip: padding-box;
+      background-clip: padding-box;
+      box-shadow: none;
+      border: 0;
+      outline: none;
+      color: #333;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.9); }
   #tracklist-container .shadow {
     height: 6px;
     background: white; }
@@ -179,11 +206,17 @@ html, body {
         background-image: -ms-linear-gradient(top, #878686 0%, #404040 60%, #f2f2f2 100%);
         background-image: -o-linear-gradient(top, #878686 0%, #404040 60%, #f2f2f2 100%);
         background-image: linear-gradient(top, #878686 0%, #404040 60%, #f2f2f2 100%); }
+        @media screen and (max-device-width: 320px) and (orientation: portrait) {
+          #tracklist-container .track .right .wave {
+            width: 370px; } }
         #tracklist-container .track .right .wave .wave-mask {
           -webkit-mask-box-image: url(https://w1.sndcdn.com/cWHNerOLlkUq_m.png);
           background: white;
           height: 40px;
           width: 310px; }
+          @media screen and (max-device-width: 320px) and (orientation: portrait) {
+            #tracklist-container .track .right .wave .wave-mask {
+              width: 370px; } }
       #tracklist-container .track .right .duration {
         display: inline-block;
         background: #000;
@@ -198,6 +231,9 @@ html, body {
         height: 1px;
         margin-top: 6px;
         border-bottom: 1px solid #e5e5e5; }
+        @media screen and (max-device-width: 320px) and (orientation: portrait) {
+          #tracklist-container .track .right .border {
+            width: 370px; } }
 
 #upload-container {
   display: none; }

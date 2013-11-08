@@ -41,7 +41,7 @@ function getCookie(c_name)
 function userLoggedIn() {
   $("#disconnect-button").show();
   $("#connect-container").hide();
-  showUserTracks();
+  showTrackSelection();
 }
 
 function userLoggedOut() {
@@ -57,11 +57,46 @@ function userLoggedOut() {
 //
 //------------------------------
 
-function showUserTracks() {
-  SC.get('/me/tracks', { filter: "public" }, function(data) { 
+function showTrackSelection() {
+  stopKaleido();
+  
+  // Display user tracks by default
+  getUserTracks();
 
-    // Display user tracks
-    for (var i=0; i<data.length; i++) {
+  $("#usertracks").on('click', function(e) {
+    $("#usertracks").toggleClass("selected");
+    $("#searchInput").val("");
+    getUserTracks();
+  });
+  
+  // Search input field
+  $("#searchInput").on('keyup', function(e) {
+    // On enter key
+    if(e.keyCode == 13){
+      // Remove focus from search field
+      $("#searchInput").blur();
+      $("#usertracks").toggleClass("selected");
+
+      var self = $(this);
+      SC.get('/tracks', { q: $(this).val(), filter: "public" }, function(data, error) {
+        setTrackList(data);
+      });
+    }
+  }); 
+}
+
+function getUserTracks() {
+  SC.get('/me/tracks', { filter: "public" }, function(data) { 
+    setTrackList(data);
+    $("#tracklist-container").show();   
+  }); 
+}
+
+// Fills list with tracks from SC callback
+function setTrackList(data) {
+  $("#tracklist-container .list").html("");
+
+  for (var i=0; i<data.length; i++) {
        // Track info 
       var track = $("<div  class='track' id='" + data[i].id + "'></div>" );
       if (data[i].artwork_url == null || data[i].artwork_url == "null")
@@ -100,9 +135,6 @@ function showUserTracks() {
         );
       }); 
     }
-
-    $("#tracklist-container").show();
-  }); 
 }
 
 function trackSelected(trackId, username, title, duration, permalinkUrl) {
@@ -274,6 +306,7 @@ function setTrackPlayer(trackObj, kaleidoImages) {
   var playing = false; 
   var sound;
   // Stream track
+  // trackObj.id,
   SC.stream("/tracks/" + trackObj.id, function(streamed){
     sound = streamed;
   });
@@ -342,7 +375,7 @@ function setTrackPlayer(trackObj, kaleidoImages) {
 }
 
 function trackFinished(imageUrl) {
-  $(".caleido_cont").find(".ksc" ).stop();
+  stopKaleido();
   setKaleidoImage(imageUrl);
   $("#track-player").find(".time").html("0:00");
   $("#playbutton").show();
@@ -357,6 +390,10 @@ function trackFinished(imageUrl) {
 
 function setKaleidoImage(url) {
   $(".caleido .ksc").css("background-image", "url('" + url + "')");
+}
+
+function stopKaleido() {
+  $(".caleido_cont").find(".ksc" ).stop();
 }
 
 function startKaleido() {
