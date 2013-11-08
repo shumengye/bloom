@@ -26,6 +26,11 @@ html, body {
   background: rgba(0,0,0,.7);
   padding: 2px 5px;
   color: #fff;
+
+  @include iphone-portrait {
+    font-size: 48px;
+    line-height: 50px;
+  }
 }
 
 .subtitle{
@@ -37,6 +42,10 @@ html, body {
   padding: 2px 5px;
   color: #fff;
 
+  @include iphone-portrait {
+    font-size: 34px;
+    line-height: 36px;
+  }
 }
 
 #connect-container {
@@ -44,14 +53,29 @@ html, body {
   width: 500px;
   height: 100px;
   @include centered;
-  padding-left: 80px;
   padding-bottom: 80px;
+
+  @include iphone {
+    padding-left: 0px;
+  }
+
+  #titlewrapper {
+    padding-left: 45px;
+
+    @include iphone-portrait {
+      padding-left: 5px;
+    }
+  }
+ 
 
   #connect-button {
     display: block;
-    margin-top: 20px;
-    margin-left: 90px;
+    margin: 20px auto;
     cursor: pointer;
+
+    @include iphone {
+      width: 340px;
+    }
   }
 }
 
@@ -89,20 +113,33 @@ html, body {
   display: none; 
 
   .titles {
-    width: 700px;
+    width: 600px;
     height: 80px;
+    text-align: center;
     @include centered; 
     top: -280px;
-
-    text-align: center;
+    @include iphone-portrait {
+        top: -400px;
+    }
+    
 
     .subtitle {
       font-size: 24px;
+      line-height: 26px;
+
+      @include iphone-portrait {
+        font-size: 36px;
+        line-height: 38px;
+      }
     }
 
     .time {
       font-size: 18px;
-      line-height: 20px;
+      line-height: 20px;  
+      @include iphone-portrait {
+        font-size: 26px;
+        line-height: 28px;
+      }
     }
   }
 
@@ -114,16 +151,33 @@ html, body {
     background: url('../assets/circle.svg');
     background-size: cover;
 
+    @include iphone-portrait {
+      width: 140px;
+      height: 140px;
+    }
+
+    &:hover {
+      background-image: url('../assets/circle_hover.svg');
+    }
+
     #playbutton {
       height: 40px;
       @include centered; 
       padding-left: 10px; 
+
+      @include iphone-portrait {
+        height: 54px;
+      }
     }
 
     #pausebutton {
       display: none;
       height: 35px;
       @include centered; 
+
+      @include iphone-portrait {
+        height: 49px;
+      }
     }
   }
 }

@@ -193,8 +193,8 @@ function setTrackPlayer(trackObj, kaleidoImages) {
 
   var playing = false; 
   var sound;
-
-  SC.stream("/tracks/" + trackObj.id, function(streamed){
+  //trackObj.id
+  SC.stream("/tracks/74916325" , function(streamed){
     sound = streamed;
   });
 
@@ -233,6 +233,8 @@ function setTrackPlayer(trackObj, kaleidoImages) {
             setKaleidoImage(kaleidoImages[currentImage]);
             imagePivot += imagePivot;
           }
+
+
         },
 
         // Track has ended
@@ -275,7 +277,7 @@ function startKaleido() {
     $(".caleido_cont").each(function(i){ 
     $(this).find(".ksc").each(function(i){ 
       $(this).css({ "background-position-x": 0, "background-position-y": 0  });
-      animateSegment(this, "100%", "80%");
+      animateSegment(this, "100%", "100%");
     });   
   });
 }
@@ -284,16 +286,15 @@ function animateSegment(el, posX, posY) {
   var s = el;
   $(el).animate(
         { "background-position-x": posX, "background-position-y": posY },
-        10000,
+        12000,
         'linear',
         function() {
-          $(el).css({backgroundPosition:'0px 0px'});
+          $(el).css({backgroundPosition:'0% 0%'});
           animateSegment(el, posX, posY); 
         }
       );    
   return this;
 }
-
 
 (function($){
 
