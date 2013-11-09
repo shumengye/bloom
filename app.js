@@ -146,6 +146,8 @@ function setTrackList(data) {
 function trackSelected(trackId, username, title, duration, permalinkUrl, durationSec) {
   $("#tracklist-container").hide();
 
+  $("#share-container").find("#bloomlink").attr("href", location.href + "?track=" + trackId);
+
   $("#upload-container").find(".tracktitle").html(title);
   $("#upload-container").find(".username").html(username);
   $("#upload-container").find(".time").html(duration);
@@ -166,7 +168,6 @@ function trackSelected(trackId, username, title, duration, permalinkUrl, duratio
   });
 
   // Drag & drop file upload eventlisteners
-  
   var pos = 0;  // default position in track for image
   var minpos = 0; // by default, image can be added anywhere between start and end
   var first = true; // keep track if this is first image for track
@@ -181,6 +182,9 @@ function trackSelected(trackId, username, title, duration, permalinkUrl, duratio
       var last = results[results.length - 1];  
       minpos = last.get("position") + 1;
     }
+
+    if (!first) 
+      $("#share-container").show();
   });
 
   var dragEl = $("#uploadcircle");
@@ -196,6 +200,9 @@ function trackSelected(trackId, username, title, duration, permalinkUrl, duratio
           var last = results[results.length - 1]; 
           minpos = last.get("position") + 1;
         }    
+
+        if (!first) 
+          $("#share-container").show();
       });
   });
   dragEl.on('dragleave', function (e) {

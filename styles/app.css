@@ -32,6 +32,13 @@ html, body {
       font-size: 34px;
       line-height: 36px; } }
 
+#poweredlogo {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  margin: auto;
+  z-index: 20; }
+
 #connect-container {
   display: none;
   width: 500px;
@@ -235,6 +242,21 @@ html, body {
           #tracklist-container .track .right .border {
             width: 370px; } }
 
+#share-container {
+  display: none;
+  width: 300px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  bottom: 80px;
+  z-index: 20;
+  text-align: center; }
+  #share-container #bloomlink {
+    color: #ff3600;
+    font-size: .8em;
+    outline: none; }
+
 #upload-container {
   display: none; }
   #upload-container #uploadstatus {
@@ -249,9 +271,9 @@ html, body {
     left: 0;
     right: 0;
     z-index: 20;
-    bottom: -200px;
+    bottom: -160px;
     color: #ff3400;
-    ffont-size: 24px;
+    font-size: .8em;
     line-height: 26px; }
   #upload-container .titles {
     width: 600px;
@@ -405,14 +427,6 @@ html, body {
       @media screen and (max-device-width: 320px) and (orientation: portrait) {
         #track-player #playcircle #pausebutton {
           height: 49px; } }
-
-#poweredlogo {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  margin: auto;
-  z-index: 20; }
 
 /* common kaleidoscope styles */
 .caleido {

@@ -48,6 +48,15 @@ html, body {
   }
 }
 
+#poweredlogo {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  margin: auto;
+  z-index: 20;
+}
+
+
 #connect-container {
   display: none;
   width: 500px;
@@ -66,7 +75,6 @@ html, body {
       padding-left: 5px;
     }
   }
- 
 
   #connect-button {
     display: block;
@@ -259,6 +267,31 @@ $inner_item_width_iphone_portrait: 370px;
   }
 }
 
+#share-container {
+  display: none;
+  width: 300px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  bottom: 80px;
+  z-index: 20;
+  text-align: center;
+
+  #bloomlink {
+    //padding: 7px 12px;
+    //@include linear-gradient("top, #ff6400 0%, #ff3600 100%");
+    //background: #ff3600;
+    //color: #fff;
+    //@include border-radius(6px);
+    //text-decoration: none;
+    color: #ff3600;
+    font-size: .8em;
+    outline: none;
+    
+  }
+}
+
 #upload-container {
   display: none;
 
@@ -268,9 +301,9 @@ $inner_item_width_iphone_portrait: 370px;
       height: 20px;
       text-align: center;
       @include centered; 
-      bottom: -200px;
+      bottom: -160px;
       color: #ff3400;
-      ffont-size: 24px;
+      font-size: .8em;
       line-height: 26px;
     }
 
@@ -439,15 +472,6 @@ $inner_item_width_iphone_portrait: 370px;
   }
 }
 
-#poweredlogo {
-      position: absolute;
-      bottom: 20px;
-      left: 0;
-      right: 0;
-      margin: auto;
-      z-index: 20;
-}
-
 /* common kaleidoscope styles */
 .caleido { 
   overflow: hidden;
@@ -481,6 +505,7 @@ $inner_item_width_iphone_portrait: 370px;
     left: 100%;
     top:0;
     background-image:url(../assets/tmp2.jpg);
+    //background-size: cover;
     @include rotate(30deg);
     @include transform-origin(left top);
   }
