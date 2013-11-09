@@ -252,10 +252,16 @@ html, body {
   bottom: 80px;
   z-index: 20;
   text-align: center; }
+  @media screen and (max-device-width: 480px) and (orientation: landscape) {
+    #share-container {
+      bottom: 40px; } }
   #share-container #bloomlink {
     color: #ff3600;
-    font-size: .8em;
+    font-size: 1em;
     outline: none; }
+    @media screen and (max-device-width: 480px) {
+      #share-container #bloomlink {
+        font-size: 1em; } }
 
 #upload-container {
   display: none; }
@@ -273,8 +279,11 @@ html, body {
     z-index: 20;
     bottom: -160px;
     color: #ff3400;
-    font-size: .8em;
+    font-size: 1em;
     line-height: 26px; }
+    @media screen and (max-device-width: 480px) {
+      #upload-container #uploadstatus {
+        font-size: 1em; } }
   #upload-container .titles {
     width: 600px;
     height: 80px;

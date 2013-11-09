@@ -297,6 +297,8 @@ function attachImageToTrack(trackId, file, pos) {
       $("#uploadstatus").html("Image added at "+ positionString(pos));
       $("#uploadstatus" ).fadeOut(2000);
 
+      $("#share-container").show();
+
     }, function (error) {
       console.log(error);
     });
@@ -346,6 +348,9 @@ function bloom(trackId) {
 
 // Converts second to position string format 0:00
 function positionString(sec) {
+  if (sec == 0 || sec==undefined)
+    return "0:00";
+
   var sec1 = 0;  // single seconds
   var sec2 = 0;  // tens of seconds
   var min = 0;  // minutes
@@ -384,7 +389,6 @@ function setTrackPlayer(trackObj, kaleidoImages) {
     sound = streamed;
   });
 
-  console.log("images " + kaleidoImages[1][0]);
 
   // Set first image for kaleidoscope
   setKaleidoImage(kaleidoImages[0][0]);

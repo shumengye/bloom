@@ -278,17 +278,18 @@ $inner_item_width_iphone_portrait: 370px;
   z-index: 20;
   text-align: center;
 
+  @include iphone-landscape {
+    bottom: 40px;
+  }
+
   #bloomlink {
-    //padding: 7px 12px;
-    //@include linear-gradient("top, #ff6400 0%, #ff3600 100%");
-    //background: #ff3600;
-    //color: #fff;
-    //@include border-radius(6px);
-    //text-decoration: none;
     color: #ff3600;
-    font-size: .8em;
+    font-size: 1em;
     outline: none;
-    
+
+    @include iphone {
+        font-size: 1em;
+    }
   }
 }
 
@@ -303,8 +304,12 @@ $inner_item_width_iphone_portrait: 370px;
       @include centered; 
       bottom: -160px;
       color: #ff3400;
-      font-size: .8em;
+      font-size: 1em;
       line-height: 26px;
+
+      @include iphone {
+        font-size: 1em;
+      }
     }
 
    .titles {
