@@ -435,6 +435,16 @@ function setTrackPlayer(trackObj, kaleidoImages) {
         // Track has ended
         onfinish: function() {
           playing = false;
+          currentImage = 0;
+          if (kaleidoImages.length > 1) {
+            if (kaleidoImages[currentImage+1][1] > 0)
+              imagePivot = kaleidoImages[currentImage+1][1];
+            else
+              imagePivot = Math.floor( Math.floor(trackObj.duration / 1000) / kaleidoImages.length );
+          }
+          else
+            imagePivot = 0;
+
           trackFinished(kaleidoImages[0][0]);
         }
 
