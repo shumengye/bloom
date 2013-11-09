@@ -114,6 +114,10 @@ function setTrackList(data) {
       var wavemask = $("<div class='wave-mask'></div>");
       wavemask.css("-webkit-mask-box-image", "url(" +  data[i].waveform_url + ")");
       wave.append(wavemask);
+      // dummy element for storing seconds
+      var sec = $("<div class='durationsec' style='visibility: hidden'>" + Math.floor(data[i].duration/1000) + "</div>");
+      wave.append(sec);
+
       var duration = $("<div class='duration'>" + positionString(Math.floor(data[i].duration/1000)) + "</div>");
       wave.append(duration);
       right.append(wave);
@@ -126,19 +130,20 @@ function setTrackList(data) {
 
       // On select event for tracks
       var tmp = data[i];
+      
       track.on('click', function(e) {
         trackSelected($(this).attr("id"), 
           $(this).find(".username").html(),
           $(this).find(".title").html(),
           $(this).find(".duration").html(),
-          tmp.permalink_url
+          tmp.permalink_url,
+          $(this).find(".durationsec").html()
         );
       }); 
     }
 }
 
-function trackSelected(trackId, username, title, duration, permalinkUrl) {
-
+function trackSelected(trackId, username, title, duration, permalinkUrl, durationSec) {
   $("#tracklist-container").hide();
 
   $("#upload-container").find(".tracktitle").html(title);
@@ -146,7 +151,6 @@ function trackSelected(trackId, username, title, duration, permalinkUrl) {
   $("#upload-container").find(".time").html(duration);
   $("#upload-container").find(".titles").attr("href", permalinkUrl);
   $("#upload-container").show();
-
 
   // Mobile file upload
   // Simulate click on hidden file input
@@ -162,26 +166,63 @@ function trackSelected(trackId, username, title, duration, permalinkUrl) {
   });
 
   // Drag & drop file upload eventlisteners
+  
+  var pos = 0;  // default position in track for image
+  var minpos = 0; // by default, image can be added anywhere between start and end
+  var first = true; // keep track if this is first image for track
+
+  // Number of images linked to this track
+  var Image = Parse.Object.extend("Image");
+  var query = new Parse.Query(Image);
+  query.equalTo("trackId", trackId);
+  query.find().then(function(results) {
+    if (results.length > 0) {
+      first = false;
+      var last = results[results.length - 1];  
+      minpos = last.get("position") + 1;
+    }
+  });
+
   var dragEl = $("#uploadcircle");
   dragEl.on('dragenter', function (e) {
       e.stopPropagation();
       e.preventDefault();
       $(this).toggleClass("dragged");
+      $("#uploadstatus").show();
+
+      query.find().then(function(results) {
+        if (results.length > 0) {
+          first = false;
+          var last = results[results.length - 1]; 
+          minpos = last.get("position") + 1;
+        }    
+      });
   });
   dragEl.on('dragleave', function (e) {
       e.stopPropagation();
       e.preventDefault();
       $(this).toggleClass("dragged");
+      $("#uploadstatus" ).html("");
   });
   dragEl.on('dragover', function (e) {
-       e.stopPropagation();
-       e.preventDefault();
+
+      // Show position of image in track, unless it's the first image
+      // minpos: first position where this image can be added (after previous images)
+      if (!first) {
+        pos = Math.floor((e.originalEvent.offsetX / e.target.offsetWidth) * (durationSec - minpos));
+        pos = pos + minpos;
+        posString = positionString(pos);
+        $("#uploadstatus").html(posString);
+      }
+        
+      e.stopPropagation();
+      e.preventDefault();
   });
   dragEl.on('drop', function (e) {  
       e.preventDefault();
       if (window.FileReader ) {
         var file = e.originalEvent.dataTransfer.files[0];
-        attachImageToTrack(trackId, file);
+        attachImageToTrack(trackId, file, pos);
       }
   });
 
@@ -208,7 +249,7 @@ function trackSelected(trackId, username, title, duration, permalinkUrl) {
 //
 //------------------------------
 
-function attachImageToTrack(trackId, file) {
+function attachImageToTrack(trackId, file, pos) {
     $("#uploadstatus").hide();
     $("#uploadstatus").fadeIn(2000);
     $("#uploadstatus").html("Uploading...");
@@ -239,13 +280,14 @@ function attachImageToTrack(trackId, file) {
       var newImage = new Parse.Object("Image");
       newImage.set("imageFile", parseFile);
       newImage.set("trackId", trackId);
+      newImage.set("position", pos);
 
       return newImage.save();
     }, function(error) {
       console.log("File could not be save to Parse");
     }).then(function(image) {
       
-      $("#uploadstatus").html("Image added");
+      $("#uploadstatus").html("Image added at "+ positionString(pos));
       $("#uploadstatus" ).fadeOut(2000);
 
     }, function (error) {
@@ -278,7 +320,8 @@ function bloom(trackId) {
       if (results.length > 0) {
         for (var i = 0; i < results.length; i++) {
           var photo = results[i].get("imageFile");
-          kaleidoImages.push(photo.url());
+          var position = results[i].get("position");
+          kaleidoImages.push(new Array(photo.url(), position));
         }
       }
       else
@@ -334,19 +377,26 @@ function setTrackPlayer(trackObj, kaleidoImages) {
     sound = streamed;
   });
 
+  console.log("images " + kaleidoImages[1][0]);
+
   // Set first image for kaleidoscope
-  setKaleidoImage(kaleidoImages[0]);
+  setKaleidoImage(kaleidoImages[0][0]);
   // Preload remaining images
   for (var i = 1; i < kaleidoImages.length; i++) {
     var img = new Image();
-    img.src = kaleidoImages[i];
+    img.src = kaleidoImages[i][0];
   }
   var currentImage = 0;
   // Check if there are more than one image, imagePivot is interval to next image in seconds
-  if (kaleidoImages.length > 1)
-    var imagePivot = Math.floor( Math.floor(trackObj.duration / 1000) / kaleidoImages.length );
+  if (kaleidoImages.length > 1) {
+    if (kaleidoImages[currentImage+1][1] > 0)
+      var imagePivot = kaleidoImages[currentImage+1][1];
+    else
+      var imagePivot = Math.floor( Math.floor(trackObj.duration / 1000) / kaleidoImages.length );
+  }
   else
     var imagePivot = 0;
+  console.log("imagepivot " + imagePivot);
 
   $("#playcircle").on('click', function (e) {  
     // Play button was clicked
@@ -366,17 +416,15 @@ function setTrackPlayer(trackObj, kaleidoImages) {
           // Check if the next image should be displayed 
           if (imagePivot > 0 && sec > imagePivot && currentImage < (kaleidoImages.length-1)) {
             currentImage++;
-            setKaleidoImage(kaleidoImages[currentImage]);
+            setKaleidoImage(kaleidoImages[currentImage][0]);
             imagePivot += imagePivot;
           }
-
-
         },
 
         // Track has ended
         onfinish: function() {
           playing = false;
-          trackFinished(kaleidoImages[0]);
+          trackFinished(kaleidoImages[0][0]);
         }
 
       });
@@ -465,7 +513,6 @@ function animateSegment(el, posX, posY) {
   var paramTrack = getUrlParameters("track");
   if (paramTrack) {
     // Playback mode
-    console.log(paramTrack);
     bloom(paramTrack);
   }
   else {
