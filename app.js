@@ -49,6 +49,7 @@ function userLoggedOut() {
   $("#connect-container").show();
   $("#tracklist-container").html("");
   $("#tracklist-container").hide();
+  $("#upload-container").hide();
 }
 
 //------------------------------
@@ -429,6 +430,13 @@ function setTrackPlayer(trackObj, kaleidoImages) {
             currentImage++;
             setKaleidoImage(kaleidoImages[currentImage][0]);
             imagePivot += imagePivot;
+            if (kaleidoImages.length > 1) {
+              if (kaleidoImages[currentImage+1][1] > 0)
+                imagePivot = kaleidoImages[currentImage+1][1];
+              else
+                imagePivot += imagePivot;
+              console.log("imagepivot " + imagePivot);
+            }
           }
         },
 
@@ -558,7 +566,9 @@ function animateSegment(el, posX, posY) {
   //
   //------------------------------
   $("#connect-button").on('click', function (e)  {
-     SC.connect(function(){
+
+    SC.connect(function(){
+      console.log("hello");
         // Store access token
         setCookie('SC_SoundFlower', SC.accessToken(), 30);
         userLoggedIn();
